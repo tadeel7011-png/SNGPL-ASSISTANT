@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SNGPL AI</title>
+<link rel="icon" href="logo.png">
+<style>
+:root{--bg:#0b0d14;--panel:#12151f;--panel2:#181c29;--line:#242a3b;--tx:#e8ebf4;--mut:#8a93ab;--ac:#7c5cff;--ac2:#22d3ee;--ok:#34d399;--warn:#fbbf24;--bad:#f87171;--r:16px;color-scheme:dark}
+:root[data-theme=light]{--bg:#f4f6fb;--panel:#fff;--panel2:#eef1f8;--line:#dde2ee;--tx:#161a29;--mut:#677090;color-scheme:light}
+@media(prefers-color-scheme:light){:root:not([data-theme=dark]){--bg:#f4f6fb;--panel:#fff;--panel2:#eef1f8;--line:#dde2ee;--tx:#161a29;--mut:#677090;color-scheme:light}}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{background:radial-gradient(900px 500px at 80% -10%,color-mix(in srgb,var(--ac) 22%,transparent),transparent),radial-gradient(700px 400px at -10% 110%,color-mix(in srgb,var(--ac2) 14%,transparent),transparent),var(--bg);color:var(--tx);font:15px/1.6 Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0);display:flex;justify-content:center}
+.shell{display:flex;width:100%;height:100%}
+.app{flex:1;min-width:0;max-width:920px;margin:0 auto;height:100%;display:flex;flex-direction:column;padding:0 16px}
+header{display:flex;align-items:center;gap:12px;padding:16px 0}
+.logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#0ea5e9,#1e40af);display:grid;place-items:center;color:#fff;font-weight:700;box-shadow:0 6px 24px rgba(14,165,233,.45)}
+.logo svg{width:28px;height:28px}.av svg{width:22px;height:22px}
+h1{font-size:17px;font-weight:650;letter-spacing:.2px}
+.sub{font-size:12px;color:var(--mut)}
+.sp{flex:1}
+.pill{display:flex;align-items:center;gap:7px;font-size:12px;padding:6px 11px;border:1px solid var(--line);border-radius:99px;background:var(--panel);color:var(--mut)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 0 var(--ok);animation:pulse 2s infinite}
+.dot.off{background:var(--warn);animation:none}
+@keyframes pulse{70%{box-shadow:0 0 0 7px transparent}}
+.ib{background:var(--panel);border:1px solid var(--line);color:var(--tx);width:36px;height:36px;border-radius:11px;cursor:pointer;font-size:16px}
+.ib:hover{border-color:var(--ac)}
+main{flex:1;overflow:auto;padding:8px 2px 16px;scroll-behavior:smooth}
+.hero{text-align:center;margin:7vh auto 0;max-width:560px}
+.hero h2{font-size:28px;font-weight:700;background:linear-gradient(90deg,var(--ac),var(--ac2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{color:var(--mut);margin:8px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.chip{border:1px solid var(--line);background:var(--panel);color:var(--tx);padding:9px 14px;border-radius:99px;font-size:13px;cursor:pointer;transition:.15s}
+.chip:hover{border-color:var(--ac);transform:translateY(-1px)}
+.msg{display:flex;gap:12px;margin:18px 0;animation:in .25s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}}
+.av{flex:none;width:32px;height:32px;border-radius:10px;display:grid;place-items:center;font-size:13px;font-weight:700}
+.msg.bot .av{background:linear-gradient(135deg,#0ea5e9,#1e40af);color:#fff}
+.msg.user .av{background:var(--panel2);color:var(--mut);border:1px solid var(--line)}
+.body{min-width:0;flex:1}
+.who{font-size:12px;color:var(--mut);margin-bottom:2px}
+.txt{white-space:pre-wrap;word-wrap:break-word}
+.txt code{background:var(--panel2);border:1px solid var(--line);padding:1px 6px;border-radius:6px;font:13px ui-monospace,Menlo,monospace}
+.cur::after{content:"";display:inline-block;width:7px;height:15px;background:var(--ac);margin-left:3px;vertical-align:-2px;animation:bl 1s steps(1) infinite}
+@keyframes bl{50%{opacity:0}}
+.src{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.src span{font-size:12px;color:var(--mut);border:1px solid var(--line);background:var(--panel);padding:3px 10px;border-radius:8px}
+.src b{color:var(--ac2);font-weight:600;margin-right:4px}
+.meta{font-size:11px;color:var(--mut);margin-top:6px}
+.composer{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:10px;display:flex;align-items:flex-end;gap:8px;box-shadow:0 10px 40px rgba(0,0,0,.25);margin-bottom:10px}
+.composer:focus-within{border-color:var(--ac)}
+textarea{flex:1;background:none;border:0;outline:0;resize:none;color:var(--tx);font:inherit;max-height:160px;padding:8px 6px}
+.btn{width:42px;height:42px;border:0;border-radius:13px;cursor:pointer;font-size:17px;color:#fff;background:linear-gradient(135deg,var(--ac),var(--ac2));transition:.15s}
+.btn:hover{filter:brightness(1.1)}
+.btn.mic{background:var(--panel2);color:var(--tx);border:1px solid var(--line)}
+.btn.mic.on{background:var(--bad);border-color:var(--bad);color:#fff}
+.foot{text-align:center;font-size:11px;color:var(--mut);margin-bottom:12px}
+/* voice overlay */
+.voice{position:fixed;inset:0;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(14px);display:none;flex-direction:column;align-items:center;justify-content:center;gap:26px;z-index:10;padding:env(safe-area-inset-top,0) 20px env(safe-area-inset-bottom,0)}
+.voice.show{display:flex}
+.orb{width:170px;height:170px;border-radius:50%;background:radial-gradient(circle at 35% 30%,var(--ac2),var(--ac) 60%,#2a1b8f);box-shadow:0 0 80px color-mix(in srgb,var(--ac) 55%,transparent);transition:transform .12s}
+.orb.idle{animation:br 4s ease-in-out infinite}
+.orb.think{animation:sp 1.2s linear infinite;filter:hue-rotate(40deg)}
+@keyframes br{50%{transform:scale(1.06)}}
+@keyframes sp{to{transform:rotate(360deg) scale(1.05)}}
+.vst{font-size:18px;font-weight:600}
+.vtx{max-width:640px;text-align:center;color:var(--mut);min-height:48px}
+/* settings */
+dialog{margin:auto;background:var(--panel);color:var(--tx);border:1px solid var(--line);border-radius:var(--r);padding:22px;width:min(480px,92vw)}
+dialog::backdrop{background:rgba(0,0,0,.55)}
+dialog h3{margin-bottom:14px}
+label{display:block;font-size:12px;color:var(--mut);margin:12px 0 4px}
+input[type=text]{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--tx);padding:10px 12px;border-radius:10px;font:inherit}
+.row{display:flex;align-items:center;justify-content:space-between;margin-top:12px;font-size:14px}
+.acts{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+.b2{padding:9px 16px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--tx);cursor:pointer;font:inherit}
+.b2.p{background:var(--ac);border-color:var(--ac);color:#fff}
+.hint{font-size:11px;color:var(--mut);margin-top:6px}
+.hero{max-width:720px}
+.hero .lead{max-width:600px;margin:10px auto 0}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:24px 0 18px;text-align:left}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:4px}
+.card .ci{font-size:20px}.card b{font-size:14px}.card span{font-size:12.5px;color:var(--mut)}
+.tags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.tags span{font-size:12px;padding:4px 12px;border-radius:99px;border:1px solid var(--line);background:var(--panel2);color:var(--mut)}
+.note{font-size:12px;color:var(--mut);margin-top:16px}
+.has-logo .logo,.has-logo .msg.bot .av{background:#fff url(logo.png) center/78% no-repeat;border:1px solid var(--line)}
+.has-logo .logo svg,.has-logo .av svg{display:none}
+.has-logo .logo{box-shadow:0 4px 18px rgba(0,0,0,.25)}
+/* chat history sidebar */
+.side{width:272px;flex:none;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:14px 10px 10px;gap:10px;height:100%}
+.shell.collapsed .side{display:none}
+.side-top{display:flex;gap:8px}
+.newchat{flex:1;border:0;border-radius:12px;padding:10px 12px;cursor:pointer;color:#fff;font:inherit;font-weight:600;background:linear-gradient(135deg,#0ea5e9,#1e40af);transition:.15s}
+.newchat:hover{filter:brightness(1.1)}
+#closeside{display:none}
+.list{flex:1;overflow:auto;margin:0 -4px;padding:0 4px;scrollbar-width:thin}
+.grp{font-size:11px;color:var(--mut);padding:12px 10px 4px;text-transform:uppercase;letter-spacing:.6px}
+.item{display:flex;align-items:center;gap:2px;padding:9px 8px 9px 10px;border-radius:10px;cursor:pointer;font-size:13.5px}
+.item:hover,.item.on{background:var(--panel2)}
+.item.on{box-shadow:inset 2px 0 0 var(--ac2)}
+.item .t{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item .x{opacity:0;border:0;background:none;color:var(--mut);cursor:pointer;font-size:13px;padding:2px 5px;border-radius:6px}
+.item .x:hover{color:var(--tx);background:var(--line)}
+.item:hover .x{opacity:1}
+@media(hover:none){.item .x{opacity:.7}}
+.empty{color:var(--mut);font-size:13px;text-align:center;padding:24px 8px}
+.side-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;color:var(--mut);border-top:1px solid var(--line);padding-top:10px}
+.linkb{border:0;background:none;color:var(--mut);cursor:pointer;font:inherit;text-decoration:underline}
+.linkb:hover{color:var(--bad)}
+.scrim{display:none}
+.brand{display:flex;align-items:center;gap:11px;padding:2px 6px 6px}
+#menu{display:none}
+@media(max-width:800px){
+ .side{position:fixed;z-index:20;left:0;top:0;bottom:0;transform:translateX(-100%);transition:transform .2s;padding-top:calc(14px + env(safe-area-inset-top,0px));box-shadow:0 0 40px rgba(0,0,0,.4)}
+ .shell.collapsed .side{display:flex}
+ .shell.open .side{transform:none}
+ .shell.open .scrim{display:block;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:15}
+ #closeside{display:block}
+ #menu{display:block}
+ .pill.lat{display:none}
+}
+main,textarea{scrollbar-width:thin}
+</style>
+</head>
+<body>
+<div class="shell" id="shell">
+<aside class="side" id="side">
+  <div class="brand"><div class="logo"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 5C22 10 27 12 27 18.5C27 23 24 26 20 26C16 26 13 23 13 19C13 16 15 14 16 11.500C16.500 14 18 15 18.500 14C19.500 11.500 19 8.500 20 5Z" fill="#fff"/><path d="M20 14C21 17 23 18 23 21C23 23 21.700 24 20 24C18.300 24 17 23 17 21C17 19 19 18 20 14Z" fill="#38bdf8"/><rect x="3" y="29" width="34" height="5" rx="1.500" fill="#fff" opacity=".95"/><rect x="10" y="27" width="3.500" height="9" rx="1" fill="#cbd5e1"/><rect x="26.500" y="27" width="3.500" height="9" rx="1" fill="#cbd5e1"/></svg></div><div><h1>SNGPL AI</h1><div class="sub">AI-powered assistant</div></div></div>
+  <div class="side-top"><button class="newchat" id="newchat">＋ New chat</button><button class="ib" id="closeside" title="Close">✕</button></div>
+  <input type="text" id="q" placeholder="Search chats">
+  <div class="list" id="list"></div>
+  <div class="side-foot"><span>Saved only in this browser</span><button class="linkb" id="clearall">Clear all</button></div>
+</aside>
+<div class="scrim" id="scrim"></div>
+<div class="app">
+  <header>
+    <button class="ib" id="menu" title="Chat history">☰</button>
+    
+    
+    <div class="sp"></div>
+    <div class="pill"><span class="dot" id="dot"></span><span id="status">Demo mode</span></div>
+    <div class="pill lat" title="Time to first token">⚡ <span id="lat">— ms</span></div>
+    <button class="ib" id="theme" title="Toggle theme">◐</button>
+    <button class="ib" id="cfg" title="Settings">⚙</button>
+  </header>
+
+  <main id="chat">
+    <div class="hero" id="hero">
+      <h2>Welcome to SNGPL Assistant</h2>
+      <p class="lead">Sui Northern Gas Pipelines Limited (SNGPL) is Pakistan's largest integrated gas utility, headquartered in Lahore.</p>
+      <div class="cards">
+        <div class="card"><div class="ci">📚</div><b>Policy answers</b><span>Ask about rules and procedures in plain language.</span></div>
+        <div class="card"><div class="ci">🔎</div><b>Cited sources</b><span>Every answer shows the manual it came from.</span></div>
+        <div class="card"><div class="ci">🔒</div><b>Private by design</b><span>Questions are answered locally on this machine.</span></div>
+      </div>
+      <div class="tags"><span>Admin</span><span>Customer Service</span><span>HR</span><span>HSE</span><span>Medical Policy</span><span>Risk Management</span></div>
+      <div class="note">Always verify important decisions against the official document.</div>
+    </div>
+  </main>
+
+  <div class="composer">
+    <textarea id="in" rows="1" placeholder="Message SNGPL AI…  (Enter to send, Shift+Enter for new line)"></textarea>
+    <button class="btn mic" id="mic" title="Voice conversation">🎙</button>
+    <button class="btn" id="send" title="Send">➤</button>
+  </div>
+  <div class="foot">Responses may contain errors. Verify important information against the cited sources.</div>
+</div>
+</div>
+
+<div class="voice" id="voice">
+  <div class="orb idle" id="orb"></div>
+  <div class="vst" id="vst">Listening…</div>
+  <div class="vtx" id="vtx"></div>
+  <button class="b2 p" id="vend">End voice chat</button>
+</div>
+
+<dialog id="dlg">
+  <h3>Settings</h3>
+  <label>Chat endpoint (OpenAI-compatible, streaming)</label>
+  <input type="text" id="s-url" placeholder="http://localhost:11434/v1/chat/completions">
+  <div class="hint">Works with Ollama, LM Studio, llama.cpp server, vLLM, or your own FastAPI RAG route. Leave empty for demo mode.</div>
+  <label>Model</label>
+  <input type="text" id="s-model" placeholder="llama3.2">
+  <label>API key (optional)</label>
+  <input type="text" id="s-key" placeholder="Bearer token, if required">
+  <label>System prompt</label>
+  <input type="text" id="s-sys" placeholder="You are SNGPL AI, a helpful assistant.">
+  <div class="row"><span>Speak replies aloud</span><input type="checkbox" id="s-tts"></div>
+  <div class="row"><span>Show full answer at once (no typing effect)</span><input type="checkbox" id="s-inst"></div>
+  <div class="acts"><button class="b2" id="s-x">Cancel</button><button class="b2 p" id="s-ok">Save</button></div>
+</dialog>
+
+<script>
+(function(){
+{const im=new Image();im.onload=()=>document.documentElement.classList.add('has-logo');im.src='logo.png'}
+const LOGO='<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 5C22 10 27 12 27 18.5C27 23 24 26 20 26C16 26 13 23 13 19C13 16 15 14 16 11.500C16.500 14 18 15 18.500 14C19.500 11.500 19 8.500 20 5Z" fill="#fff"/><path d="M20 14C21 17 23 18 23 21C23 23 21.700 24 20 24C18.300 24 17 23 17 21C17 19 19 18 20 14Z" fill="#38bdf8"/><rect x="3" y="29" width="34" height="5" rx="1.500" fill="#fff" opacity=".95"/><rect x="10" y="27" width="3.500" height="9" rx="1" fill="#cbd5e1"/><rect x="26.500" y="27" width="3.500" height="9" rx="1" fill="#cbd5e1"/></svg>';
+const $=s=>document.getElementById(s);
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const S={url:store.get('url')||'',model:store.get('model')||'llama3.2',key:store.get('key')||'',sys:store.get('sys')||'You are SNGPL AI, a concise, helpful assistant. Cite sources when provided.',tts:store.get('tts')==='1',inst:store.get('inst')==='1'};
+const HERO=$('hero').outerHTML;
+let chats=[],cur=null,busy=false,ctrl=null,voiceOn=false,rec=null,spoken='';
+
+function refreshStatus(){const live=!!S.url;$('status').textContent=live?'Connected':'Demo mode';$('dot').className='dot'+(live?'':' off')}
+refreshStatus();
+
+/* theme */
+$('theme').onclick=()=>{const r=document.documentElement,d=r.dataset.theme||(matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');r.dataset.theme=d==='dark'?'light':'dark'};
+
+/* settings */
+$('cfg').onclick=()=>{$('s-url').value=S.url;$('s-model').value=S.model;$('s-key').value=S.key;$('s-sys').value=S.sys;$('s-tts').checked=S.tts;$('s-inst').checked=S.inst;$('dlg').showModal()};
+$('s-x').onclick=()=>$('dlg').close();
+$('s-ok').onclick=()=>{S.url=$('s-url').value.trim();S.model=$('s-model').value.trim()||'llama3.2';S.key=$('s-key').value.trim();S.sys=$('s-sys').value.trim();S.tts=$('s-tts').checked;S.inst=$('s-inst').checked;store.set('inst',S.inst?'1':'0');
+ store.set('url',S.url);store.set('model',S.model);store.set('key',S.key);store.set('sys',S.sys);store.set('tts',S.tts?'1':'0');refreshStatus();$('dlg').close()};
+
+/* rendering */
+function esc(t){return t.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+function md(t){return esc(t).replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>')}
+function addMsg(role,text){
+ $('hero')&&$('hero').remove();
+ const d=document.createElement('div');d.className='msg '+(role==='user'?'user':'bot');
+ d.innerHTML='<div class="av">'+(role==='user'?'You':LOGO)+'</div><div class="body"><div class="who">'+(role==='user'?'You':'SNGPL AI')+'</div><div class="txt"></div></div>';
+ const t=d.querySelector('.txt');t.innerHTML=md(text||'');$('chat').appendChild(d);scroll();return d;
+}
+function scroll(){const c=$('chat');c.scrollTop=c.scrollHeight}
+function setSrc(body,a){let d=body.querySelector('.src');if(!d){d=document.createElement('div');d.className='src';body.appendChild(d)}
+ d.innerHTML=a.map((s,i)=>'<span><b>['+(i+1)+']</b>'+esc(String(s.title||s.source||s.name||'source'))+(s.page?' · p.'+esc(String(s.page)):'')+'</span>').join('')}
+function addMeta(body,txt){const mt=document.createElement('div');mt.className='meta';mt.textContent=txt;body.appendChild(mt)}
+function renderSaved(m){const d=addMsg(m.role==='user'?'user':'bot',m.content);const b=d.querySelector('.body');if(m.sources&&m.sources.length)setSrc(b,m.sources);if(m.meta)addMeta(b,m.meta)}
+function render(){const c=$('chat');c.innerHTML=cur.msgs.length?'':HERO;cur.msgs.forEach(renderSaved);c.scrollTop=cur.msgs.length?c.scrollHeight:0}
+
+/* TTS: speak sentence-by-sentence while streaming for minimum delay */
+function speak(chunk){if(!(S.tts||voiceOn)||!('speechSynthesis' in window)||!chunk.trim())return;const u=new SpeechSynthesisUtterance(chunk);u.rate=1.05;u.onstart=()=>vstate('speaking');u.onend=()=>{if(!speechSynthesis.speaking&&!busy&&voiceOn){startRec()}};speechSynthesis.speak(u)}
+function feedTTS(tok){spoken+=tok;const m=spoken.match(/^[\s\S]*?[.!?\n](\s|$)/);if(m){speak(m[0]);spoken=spoken.slice(m[0].length)}}
+
+/* demo backend */
+async function demo(q,onTok,onSrc,signal){
+ const ans="This is a **demo response** — no backend is connected yet. Open **Settings** and paste your `/v1/chat/completions` endpoint to go live. Your question was: \""+q.slice(0,80)+"\". Once connected, tokens stream in exactly like this, with retrieved sources shown beneath each answer.";
+ await new Promise(r=>setTimeout(r,180));
+ onSrc([{title:'handbook.pdf',page:4},{title:'pricing-faq.md'},{title:'roadmap.docx',page:2}]);
+ for(const w of ans.split(/(\s+)/)){if(signal.aborted)return;onTok(w);await new Promise(r=>setTimeout(r,22))}
+}
+
+/* live backend: OpenAI-compatible SSE; optional `sources` array in any chunk */
+async function live(q,onTok,onSrc,signal){
+ const msgs=[{role:'system',content:S.sys},...cur.msgs.map(m=>({role:m.role,content:m.content}))];
+ const h={'Content-Type':'application/json'};if(S.key)h.Authorization='Bearer '+S.key;
+ const r=await fetch(S.url,{method:'POST',headers:h,signal,body:JSON.stringify({model:S.model,messages:msgs,stream:true})});
+ if(!r.ok)throw new Error('HTTP '+r.status);
+ const rd=r.body.getReader(),dec=new TextDecoder();let buf='';
+ for(;;){const {done,value}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});
+  const lines=buf.split('\n');buf=lines.pop();
+  for(const l of lines){const s=l.trim();if(!s.startsWith('data:'))continue;const p=s.slice(5).trim();if(p==='[DONE]')return;
+   try{const j=JSON.parse(p);if(j.sources)onSrc(j.sources);const c=j.choices&&j.choices[0];const t=c&&((c.delta&&c.delta.content)||(c.message&&c.message.content));if(t)onTok(t)}catch(e){}}}
+}
+
+async function ask(q){
+ q=q.trim();if(!q||busy)return;busy=true;spoken='';speechSynthesis&&speechSynthesis.cancel();
+ const chat=cur;if(!chats.includes(chat))chats.unshift(chat);
+ addMsg('user',q);chat.msgs.push({role:'user',content:q});
+ if(chat.title==='New chat')chat.title=q.length>42?q.slice(0,42)+'…':q;
+ chat.ts=Date.now();save();renderList();
+ const m=addMsg('bot','');const t=m.querySelector('.txt'),body=m.querySelector('.body');t.classList.add('cur');if(S.inst)t.textContent='Thinking…';
+ let full='',first=true,srcs=null;const t0=performance.now();ctrl=new AbortController();
+ vstate('thinking');$('send').textContent='■';
+ const onTok=k=>{if(first){first=false;$('lat').textContent=Math.round(performance.now()-t0)+' ms'}full+=k;if(!S.inst)t.innerHTML=md(full);feedTTS(k);scroll()};
+ const onSrc=a=>{srcs=a;setSrc(body,a)};
+ try{await (S.url?live:demo)(q,onTok,onSrc,ctrl.signal)}
+ catch(e){if(e.name!=='AbortError'){t.innerHTML=md(full+(full?'\n\n':'')+'⚠️ Could not reach the assistant ('+e.message+'). Check the endpoint, CORS settings and that the server is running.')}}
+ t.classList.remove('cur');if(S.inst&&full)t.innerHTML=md(full);if(spoken.trim()){speak(spoken);spoken=''}
+ const meta=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+' · '+$('lat').textContent+' to first token';addMeta(body,meta);
+ if(full){chat.msgs.push({role:'assistant',content:full,sources:srcs,meta});chat.ts=Date.now()}
+ save();renderList();
+ busy=false;ctrl=null;$('send').textContent='➤';if(voiceOn&&!(window.speechSynthesis&&speechSynthesis.speaking))startRec();else if(!voiceOn)$('in').focus();scroll();
+}
+
+/* input */
+const inp=$('in');
+inp.addEventListener('input',()=>{inp.style.height='auto';inp.style.height=Math.min(inp.scrollHeight,160)+'px'});
+inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();go()}});
+function go(){if(busy&&ctrl){ctrl.abort();return}const v=inp.value;inp.value='';inp.style.height='auto';ask(v)}
+$('send').onclick=go;
+document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>ask(c.textContent));
+
+/* voice mode (Web Speech API — free, runs in the browser) */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+function vstate(s){if(!voiceOn)return;if(s!=='listening')$('vtx').textContent='';const o=$('orb');o.className='orb '+(s==='thinking'?'think':'idle');$('vst').textContent={listening:'Listening…',thinking:'Thinking…',speaking:'Speaking…'}[s]||''}
+function startRec(){
+ if(!voiceOn||!SR)return;try{rec&&rec.abort()}catch(e){}
+ rec=new SR();rec.interimResults=true;rec.continuous=false;rec.lang=navigator.language||'en-US';
+ vstate('listening');$('vtx').textContent='';
+ rec.onresult=e=>{let f='',i='';for(const r of e.results){(r.isFinal?(f+=r[0].transcript):(i+=r[0].transcript))}
+  speechSynthesis.cancel();$('vtx').textContent=f||i;if(f.trim()){rec.onend=null;ask(f)}};
+ rec.onerror=()=>{};rec.onend=()=>{if(voiceOn&&!busy&&!speechSynthesis.speaking)setTimeout(startRec,250)};
+ try{rec.start()}catch(e){}
+}
+$('mic').onclick=()=>{
+ if(!SR){alert('Voice input needs a browser with the Web Speech API (Chrome, Edge or Safari).');return}
+ voiceOn=true;$('voice').classList.add('show');$('mic').classList.add('on');startRec();
+};
+$('vend').onclick=()=>{voiceOn=false;try{rec&&rec.abort()}catch(e){}speechSynthesis.cancel();ctrl&&ctrl.abort();$('voice').classList.remove('show');$('mic').classList.remove('on')};
+
+/* chat history */
+const mq=matchMedia('(max-width:800px)');
+function closeDrawer(){$('shell').classList.remove('open')}
+$('menu').onclick=()=>$('shell').classList.toggle('open');
+$('scrim').onclick=closeDrawer;$('closeside').onclick=closeDrawer;
+function load(){try{chats=JSON.parse(store.get('chats')||'[]')}catch(e){chats=[]}if(!Array.isArray(chats))chats=[]}
+function save(){store.set('chats',JSON.stringify(chats.slice(0,100)))}
+function stopAll(){if(busy&&ctrl)ctrl.abort();try{speechSynthesis.cancel()}catch(e){}}
+function newChat(){stopAll();if(!(cur&&!cur.msgs.length))cur={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),title:'New chat',ts:Date.now(),msgs:[]};render();renderList();closeDrawer()}
+function openChat(id){const c=chats.find(x=>x.id===id);if(!c)return;stopAll();cur=c;render();renderList();closeDrawer()}
+function delChat(id){chats=chats.filter(x=>x.id!==id);save();if(cur&&cur.id===id){stopAll();cur=null;newChat()}else renderList()}
+function renderList(){
+ const f=$('q').value.trim().toLowerCase(),now=new Date(),d0=new Date(now.getFullYear(),now.getMonth(),now.getDate()).getTime();
+ const list=chats.filter(c=>!f||c.title.toLowerCase().includes(f)).sort((a,b)=>b.ts-a.ts);
+ const g={'Today':[],'Yesterday':[],'Previous 7 days':[],'Older':[]};
+ list.forEach(c=>{g[c.ts>=d0?'Today':c.ts>=d0-864e5?'Yesterday':c.ts>=d0-6*864e5?'Previous 7 days':'Older'].push(c)});
+ const el=$('list');el.innerHTML='';
+ if(!list.length){el.innerHTML='<div class="empty">'+(f?'No matching chats':'No chats yet')+'</div>';return}
+ for(const k in g){if(!g[k].length)continue;
+  const gh=document.createElement('div');gh.className='grp';gh.textContent=k;el.appendChild(gh);
+  g[k].forEach(c=>{const it=document.createElement('div');it.className='item'+(cur&&cur.id===c.id?' on':'');
+   it.innerHTML='<span class="t"></span><button class="x r" title="Rename">✎</button><button class="x d" title="Delete">✕</button>';
+   it.querySelector('.t').textContent=c.title;
+   it.onclick=()=>openChat(c.id);
+   it.querySelector('.r').onclick=e=>{e.stopPropagation();const n=prompt('Rename chat',c.title);if(n&&n.trim()){c.title=n.trim().slice(0,60);save();renderList()}};
+   it.querySelector('.d').onclick=e=>{e.stopPropagation();if(confirm('Delete this chat?'))delChat(c.id)};
+   el.appendChild(it)})}
+}
+$('q').oninput=renderList;$('newchat').onclick=newChat;
+$('clearall').onclick=()=>{if(chats.length&&confirm('Delete all chats?')){stopAll();chats=[];save();cur=null;newChat()}};
+load();newChat();
+})();
+</script>
+</body>
+</html>
